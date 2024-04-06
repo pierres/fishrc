@@ -1,5 +1,5 @@
 if status is-interactive
-	set -gx LESS -R
+    set -gx LESS -R
 
     if command -q chromium
         set -gx BROWSER chromium

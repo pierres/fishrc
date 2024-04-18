@@ -1,4 +1,4 @@
-function fishrc_reset_config
+function fishrc_reset_config --description 'Reset Fish configuration and reconfigure fishrc'
     for e in (set -nU)
         if test $e != __fish_initialized
             set -eU $e

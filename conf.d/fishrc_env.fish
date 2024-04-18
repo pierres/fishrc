@@ -1,10 +1,8 @@
 if status is-interactive
     set -gx LESS -R
 
-    if command -q chromium
-        set -gx BROWSER chromium
-    else if command -q firefox
-        set -gx BROWSER firefox
+    if command -q xdg-open
+        set -gx BROWSER xdg-open
     end
 
     if command -q nano

@@ -1,5 +1,7 @@
 if status is-interactive
-    set -gx LESS -R
+    if command -q less
+        set -gx LESS -R
+    end
 
     if command -q xdg-open
         set -gx BROWSER xdg-open

@@ -1,13 +1,13 @@
 function tar-diff --description='Create a patch file containing the differences between the content of two tar archives'
     # check if required tools are installed
     if not command -q bsdtar
-        echo 'bsdtar command not found'
+        echo 'bsdtar command not found' >&2
         fish_command_not_found bsdtar
         return 1
     end
 
     if not command -q diff
-        echo 'diff command not found'
+        echo 'diff command not found' >&2
         fish_command_not_found diff
         return 1
     end
@@ -21,7 +21,7 @@ function tar-diff --description='Create a patch file containing the differences 
 
     for tar in $argv
         if not test -f "$tar"
-            echo "file '$tar' not found"
+            echo "file '$tar' not found" >&2
             return 1
         end
     end
@@ -33,7 +33,7 @@ function tar-diff --description='Create a patch file containing the differences 
     set -l bname (path basename $b)
 
     if test "$aname" = "$bname"
-        echo 'filenames cannot be identical'
+        echo 'filenames cannot be identical' >&2
         return 1
     end
 

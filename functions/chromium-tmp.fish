@@ -1,6 +1,6 @@
 function chromium-tmp --wraps chromium --description 'Launch a clean Chromium instance with a temporary profile'
     if not command -q chromium
-        echo 'chromium command not found'
+        echo 'chromium command not found' >&2
         fish_command_not_found chromium
         return 1
     end

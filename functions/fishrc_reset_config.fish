@@ -25,4 +25,6 @@ function fishrc_reset_config --description 'Reset Fish configuration and reconfi
     set tide_right_prompt_items status cmd_duration context jobs
     set tide_pwd_icon_unwritable 🗲
     tide reload
+
+    fish_prompt
 end

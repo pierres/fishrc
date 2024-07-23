@@ -11,6 +11,10 @@ if status is-interactive
         set -gxa PATH $HOME/.cargo/bin
     end
 
+    if command -q go
+        set -gxa PATH "$(go env GOPATH)/bin"
+    end
+
     if command -q npm
         set -gx NPM_PACKAGES $HOME/.npm-packages
         set -gxa PATH $NPM_PACKAGES

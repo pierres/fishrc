@@ -15,11 +15,6 @@ if status is-interactive
         set -gxa PATH "$(go env GOPATH)/bin"
     end
 
-    if command -q npm
-        set -gx NPM_PACKAGES $HOME/.npm-packages
-        set -gxa PATH $NPM_PACKAGES
-    end
-
     if command -q pnpm
         set -gx PNPM_HOME $HOME/.local/share/pnpm
         set -gxa PATH $PNPM_HOME

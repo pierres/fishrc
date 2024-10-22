@@ -3,8 +3,11 @@ if status is-interactive
         set -gxa PATH $HOME/bin
     end
 
-    if command -q rustup; and rustup which rustc &>/dev/null
-        set -gxa PATH (path dirname (rustup which rustc))
+    if command -q rustup
+        set -l rust_path (rustup which rustc)
+        if test -n "$rust_path"
+            set -gxa PATH (path dirname "$rust_path")
+        end
     end
 
     if command -q cargo

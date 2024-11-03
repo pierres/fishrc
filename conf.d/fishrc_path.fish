@@ -4,7 +4,7 @@ if status is-interactive
     end
 
     if command -q rustup
-        set -l rust_path (rustup which rustc)
+        set -l rust_path (rustup which rustc 2> /dev/null)
         if test -n "$rust_path"
             set -gxa PATH (path dirname "$rust_path")
         end

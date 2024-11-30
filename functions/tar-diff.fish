@@ -1,4 +1,4 @@
-function tar-diff --description='Create a patch file containing the differences between the content of two tar archives'
+function tar-diff --description 'Create a patch file containing the differences between the content of two tar archives'
     # check if required tools are installed
     if not command -q bsdtar
         echo 'bsdtar command not found' >&2

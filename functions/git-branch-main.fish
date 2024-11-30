@@ -1,4 +1,4 @@
-function git-branch-main --description='Rename the default Git branch from master to main'
+function git-branch-main --description 'Rename the default Git branch from master to main'
     if not command -q git
         echo 'Git is not installed' >&2
         return 1

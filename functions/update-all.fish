@@ -19,8 +19,8 @@ function update-all --description 'Update all packages using different package m
     update_package 'rustup update' rustup
     update_package 'gup update' gup
     update_package 'pnpm upgrade -g --latest' pnpm
-    update_package 'flatpak update' flatpak
+    update_package 'flatpak update && flatpak remove --unused' flatpak
     update_package 'sudo fwupdmgr refresh && sudo fwupdmgr update' fwupdmgr sudo
     update_package 'sudo pkgfile -u' pkgfile sudo
-    update_package 'sudo pacman -Syu' pacman sudo
+    update_package 'sudo pacman -Syu && sudo pacman -Rcsn (pacman -Qqdt)' pacman sudo
 end

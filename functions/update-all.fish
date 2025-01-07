@@ -1,7 +1,8 @@
 function update-all --description 'Update all packages using different package managers'
-    function update_package
-        set -l cmd $argv[1]
-        set -l dependencies $argv[2..-1]
+    function __update_package
+        set -l label $argv[1]
+        set -l cmd $argv[2]
+        set -l dependencies $argv[3..-1]
 
         for dep in $dependencies
             if not command -q "$dep"
@@ -10,17 +11,19 @@ function update-all --description 'Update all packages using different package m
         end
 
         set_color --bold
-        echo "$cmd"
+        echo "$label"
         set_color normal
         eval "$cmd"
         echo -e "\n"
     end
 
-    update_package 'rustup update' rustup
-    update_package 'gup update' gup
-    update_package 'pnpm upgrade -g --latest' pnpm
-    update_package 'flatpak update' flatpak
-    update_package 'sudo fwupdmgr refresh && sudo fwupdmgr update' fwupdmgr sudo
-    update_package 'sudo pkgfile -u' pkgfile sudo
-    update_package 'sudo pacman -Syu' pacman sudo
+    __update_package rust 'rustup update' rustup
+    __update_package go 'gup update' gup
+    __update_package pnpm 'pnpm upgrade -g --latest' pnpm
+    __update_package flatpak 'sudo flatpak update && sudo flatpak remove --unused' flatpak sudo
+    __update_package fwupdmgr 'sudo fwupdmgr refresh && sudo fwupdmgr update' fwupdmgr sudo
+    __update_package pkgfile 'sudo pkgfile -u' pkgfile sudo
+    __update_package pacman 'sudo pacman -Syu && begin set -l pkgs (pacman -Qqdt); test $status -eq 0; and test -n "$pkgs"; and sudo pacman -Rcsn $pkgs; or true; end' pacman sudo
+
+    functions --erase __update_package
 end

@@ -13,7 +13,7 @@ function create-cd-image --description 'Create cue/bin image file of a CD-ROM'
 
     if test -z "$argv[1]"
         echo "Error: No image name given" >&2
-        exit 1
+        return 1
     end
 
     set -l name $argv[1]

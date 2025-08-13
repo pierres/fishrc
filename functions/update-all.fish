@@ -23,7 +23,7 @@ function update-all --description 'Update all packages using different package m
     __update_package go 'gup update && gup completion' gup
     __update_package pnpm 'pnpm upgrade -g --latest' pnpm
     __update_package flatpak 'sudo flatpak update && sudo flatpak remove --unused' flatpak sudo
-    __update_package fwupdmgr 'sudo fwupdmgr refresh && sudo fwupdmgr update' fwupdmgr sudo
+    __update_package fwupdmgr 'sudo fwupdmgr refresh --force && sudo fwupdmgr update' fwupdmgr sudo
 
     functions --erase __update_package
 end

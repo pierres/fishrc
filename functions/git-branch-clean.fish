@@ -1,7 +1,5 @@
 function git-branch-clean --description 'Remove branches that no longer exist remotely or are merged locally'
-    if not command -q git
-        echo 'git command not found' >&2
-        fish_command_not_found git
+    if not _fishrc_check_command git
         return 1
     end
 

@@ -1,7 +1,5 @@
 function firefox-tmp --wraps firefox --description 'Launch a clean Firefox instance with a temporary profile'
-    if not command -q firefox
-        echo 'firefox command not found' >&2
-        fish_command_not_found firefox
+    if not _fishrc_check_command firefox
         return 1
     end
 

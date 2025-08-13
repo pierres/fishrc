@@ -1,14 +1,6 @@
 function tar-diff --description 'Create a patch file containing the differences between the content of two tar archives'
     # check if required tools are installed
-    if not command -q bsdtar
-        echo 'bsdtar command not found' >&2
-        fish_command_not_found bsdtar
-        return 1
-    end
-
-    if not command -q diff
-        echo 'diff command not found' >&2
-        fish_command_not_found diff
+    if not _fishrc_check_command bsdtar; or not _fishrc_check_command diff
         return 1
     end
 

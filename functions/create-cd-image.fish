@@ -1,13 +1,5 @@
 function create-cd-image --description 'Create cue/bin image file of a CD-ROM'
-    if not command -q cdrdao
-        echo 'cdrdao command not found' >&2
-        fish_command_not_found cdrdao
-        return 1
-    end
-
-    if not command -q toc2cue
-        echo 'toc2cue command not found' >&2
-        fish_command_not_found toc2cue
+    if not _fishrc_check_command cdrdao; or not _fishrc_check_command toc2cue
         return 1
     end
 

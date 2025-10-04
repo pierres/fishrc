@@ -7,6 +7,12 @@ This configuration can be installed using the `justfile` included in this reposi
 just install target /
 ```
 
+Alternatively, you can install the configuration to your home directory by running the following command:
+
+```sh
+curl -sSL https://raw.githubusercontent.com/pierres/fishrc/main/install.fish | fish
+```
+
 ## Functions
 This configuration comes with a set of custom functions to streamline common tasks:
 

@@ -14,6 +14,6 @@ jobs:
       - name: Install Fish
         uses: fish-actions/install-fish@v1
       - name: Checkout code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
       - name: Check
         run: just check

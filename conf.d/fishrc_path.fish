@@ -1,4 +1,8 @@
 if status is-interactive
+    if test -d $HOME/.local/bin
+        set -gxa PATH $HOME/.local/bin
+    end
+
     if test -d $HOME/bin
         set -gxa PATH $HOME/bin
     end

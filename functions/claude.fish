@@ -19,11 +19,12 @@ function claude --wraps claude --description "Run Claude Code inside nono sandbo
         --silent \
         --allow-bind 0
 
-    # gh: config + cache for GitHub CLI
+    # gh: config + cache for GitHub CLI + docs for gh help
     if command -q gh
         set -a nono_args \
             --read ~/.config/gh \
-            --allow ~/.cache/gh
+            --allow ~/.cache/gh \
+            --proxy-allow docs.github.com
     end
 
     # node: npm/pnpm/yarn config and caches

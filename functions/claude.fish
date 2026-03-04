@@ -21,6 +21,7 @@ function claude --wraps claude --description "Run Claude Code inside nono sandbo
 
     # gh: config + cache for GitHub CLI + docs for gh help
     if command -q gh
+        mkdir -p ~/.cache/gh
         set -a nono_args \
             --read ~/.config/gh \
             --allow ~/.cache/gh \
@@ -30,6 +31,7 @@ function claude --wraps claude --description "Run Claude Code inside nono sandbo
     # node: npm/pnpm/yarn config and caches
     # tracked in https://github.com/always-further/nono/issues/233
     if command -q pnpm; or command -q npm; or command -q yarn
+        touch ~/.npmrc
         set -a nono_args --read-file ~/.npmrc
     end
     if command -q yarn
@@ -63,9 +65,11 @@ function claude --wraps claude --description "Run Claude Code inside nono sandbo
             --proxy-allow repo.packagist.org
     end
 
-    # just: temp dir for recipe scripts
+    # just: temp dir for recipe scripts (must exist before nono sees it)
     if command -q just
-        set -a nono_args --allow /run/user/(id -u)/just
+        set -l just_tmpdir /run/user/(id -u)/just
+        mkdir -p $just_tmpdir
+        set -a nono_args --allow $just_tmpdir
     end
 
     # go: module/sumdb cache, build cache + proxy/checksum hosts not in nono's allowlist
@@ -74,8 +78,10 @@ function claude --wraps claude --description "Run Claude Code inside nono sandbo
         set -a nono_args \
             --allow (go env GOPATH)/pkg \
             --allow (go env GOCACHE) \
+            --allow ~/.cache/golangci-lint \
             --proxy-allow proxy.golang.org \
-            --proxy-allow sum.golang.org
+            --proxy-allow sum.golang.org \
+            --proxy-allow storage.googleapis.com
     end
 
     # per-machine overrides via ~/.config/fish/conf.d/local.fish:

@@ -63,6 +63,11 @@ function claude --wraps claude --description "Run Claude Code inside nono sandbo
             --proxy-allow repo.packagist.org
     end
 
+    # just: temp dir for recipe scripts
+    if command -q just
+        set -a nono_args --allow /run/user/(id -u)/just
+    end
+
     # go: module/sumdb cache, build cache + proxy/checksum hosts not in nono's allowlist
     # tracked in https://github.com/always-further/nono/issues/233
     if command -q go

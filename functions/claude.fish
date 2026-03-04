@@ -78,15 +78,7 @@ function claude --wraps claude --description "Run Claude Code inside nono sandbo
         set -a nono_args $FISHRC_NONO_EXTRA_ARGS
     end
 
-    # nono's credential proxy injects an invalid GITHUB_TOKEN that overrides
-    # the valid keyring token. Clear it so gh falls back to the keyring.
-    # Only unset if user didn't set their own token before entering the sandbox.
-    # https://github.com/always-further/nono/issues/234
-    if set -q GITHUB_TOKEN
-        nono run $nono_args -- claude $argv
-    else
-        nono run $nono_args -- env GITHUB_TOKEN= claude $argv
-    end
+    nono run $nono_args -- claude $argv
 
     if test -n "$tmpdir"
         cd $HOME

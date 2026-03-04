@@ -16,7 +16,8 @@ function claude --wraps claude --description "Run Claude Code inside nono sandbo
     set -l nono_args \
         --profile claude-code \
         --allow-cwd \
-        --silent
+        --silent \
+        --allow-bind 0
 
     # gh: config + cache for GitHub CLI
     if command -q gh
@@ -26,9 +27,7 @@ function claude --wraps claude --description "Run Claude Code inside nono sandbo
     end
 
     # node: npm/pnpm/yarn config and caches
-    # npm/yarn workarounds tracked in https://github.com/always-further/nono/issues/233
-    # npm: profile sets ~/.npm read-only, --allow can't upgrade it yet
-    # (https://github.com/always-further/nono/pull/232). pnpm works fine.
+    # tracked in https://github.com/always-further/nono/issues/233
     if command -q pnpm; or command -q npm; or command -q yarn
         set -a nono_args --read-file ~/.npmrc
     end
@@ -52,8 +51,6 @@ function claude --wraps claude --description "Run Claude Code inside nono sandbo
     end
 
     # rust: cargo/rustup need write access to registry and toolchain paths
-    # profile sets ~/.cargo and ~/.rustup read-only, same --allow upgrade bug
-    # (https://github.com/always-further/nono/pull/232)
     # tracked in https://github.com/always-further/nono/issues/233
 
     # composer: global config + download cache + packagist host
@@ -73,6 +70,12 @@ function claude --wraps claude --description "Run Claude Code inside nono sandbo
             --allow (go env GOCACHE) \
             --proxy-allow proxy.golang.org \
             --proxy-allow sum.golang.org
+    end
+
+    # per-machine overrides via ~/.config/fish/conf.d/local.fish:
+    #   set -g FISHRC_NONO_EXTRA_ARGS --proxy-allow internal.corp.example.com
+    if set -q FISHRC_NONO_EXTRA_ARGS
+        set -a nono_args $FISHRC_NONO_EXTRA_ARGS
     end
 
     # nono's credential proxy injects an invalid GITHUB_TOKEN that overrides

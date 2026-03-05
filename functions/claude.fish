@@ -17,7 +17,8 @@ function claude --wraps claude --description "Run Claude Code inside nono sandbo
         --profile claude-code \
         --allow-cwd \
         --silent \
-        --allow-bind 0
+        --allow-bind 0 \
+        --no-rollback
 
     # gh: config + cache for GitHub CLI + docs for gh help
     if command -q gh

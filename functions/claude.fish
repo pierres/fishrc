@@ -17,20 +17,18 @@ function claude --wraps claude --description "Run Claude Code inside nono sandbo
         --profile claude-code \
         --allow-cwd \
         --silent \
-        --allow-bind 0 \
-        --no-rollback
+        --no-rollback \
+        --net-allow
 
-    # gh: config + cache for GitHub CLI + docs for gh help
+    # gh: config + cache for GitHub CLI
     if command -q gh
         mkdir -p ~/.cache/gh
         set -a nono_args \
             --read ~/.config/gh \
-            --allow ~/.cache/gh \
-            --proxy-allow docs.github.com
+            --allow ~/.cache/gh
     end
 
     # node: npm/pnpm/yarn config and caches
-    # tracked in https://github.com/always-further/nono/issues/233
     if command -q pnpm; or command -q npm; or command -q yarn
         touch ~/.npmrc
         set -a nono_args --read-file ~/.npmrc
@@ -41,29 +39,21 @@ function claude --wraps claude --description "Run Claude Code inside nono sandbo
             --allow ~/.cache/yarn
     end
 
-    # bun: install cache at ~/.bun (uses registry.npmjs.org, already in allowlist)
+    # bun: install cache at ~/.bun
     if command -q bun
         set -a nono_args --allow ~/.bun
     end
 
-    # deno: module cache + jsr/deno.land registries
+    # deno: module cache
     if command -q deno
-        set -a nono_args \
-            --allow ~/.cache/deno \
-            --proxy-allow jsr.io \
-            --proxy-allow deno.land
+        set -a nono_args --allow ~/.cache/deno
     end
 
-    # rust: cargo/rustup need write access to registry and toolchain paths
-    # tracked in https://github.com/always-further/nono/issues/233
-
-    # composer: global config + download cache + packagist host
-    # tracked in https://github.com/always-further/nono/issues/233
+    # composer: global config + download cache
     if command -q composer
         set -a nono_args \
             --read ~/.config/composer \
-            --allow ~/.cache/composer \
-            --proxy-allow repo.packagist.org
+            --allow ~/.cache/composer
     end
 
     # just: temp dir for recipe scripts (must exist before nono sees it)
@@ -73,20 +63,16 @@ function claude --wraps claude --description "Run Claude Code inside nono sandbo
         set -a nono_args --allow $just_tmpdir
     end
 
-    # go: module/sumdb cache, build cache + proxy/checksum hosts not in nono's allowlist
-    # tracked in https://github.com/always-further/nono/issues/233
+    # go: module/sumdb cache, build cache
     if command -q go
         set -a nono_args \
             --allow (go env GOPATH)/pkg \
             --allow (go env GOCACHE) \
-            --allow ~/.cache/golangci-lint \
-            --proxy-allow proxy.golang.org \
-            --proxy-allow sum.golang.org \
-            --proxy-allow storage.googleapis.com
+            --allow ~/.cache/golangci-lint
     end
 
     # per-machine overrides via ~/.config/fish/conf.d/local.fish:
-    #   set -g FISHRC_NONO_EXTRA_ARGS --proxy-allow internal.corp.example.com
+    #   set -g FISHRC_NONO_EXTRA_ARGS --allow /extra/path
     if set -q FISHRC_NONO_EXTRA_ARGS
         set -a nono_args $FISHRC_NONO_EXTRA_ARGS
     end

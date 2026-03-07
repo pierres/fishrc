@@ -43,6 +43,12 @@ function claude --wraps claude --description "Run Claude Code inside nono sandbo
             --allow ~/.cache/yarn
     end
 
+    # claude: cache dir for MCP logs and auth state
+    mkdir -p ~/.cache/claude ~/.cache/claude-cli-nodejs
+    set -a nono_args \
+        --allow ~/.cache/claude \
+        --allow ~/.cache/claude-cli-nodejs
+
     # bun: install cache at ~/.bun
     if command -q bun
         set -a nono_args --allow ~/.bun

@@ -1,7 +1,12 @@
 function claude --wraps claude --description "Run Claude Code inside nono sandbox"
     if not command -q nono
         echo "nono not found, running claude without sandbox" >&2
+        # Red background + cursor to warn: unsandboxed
+        printf '\033]11;#1a0a0a\007'
+        printf '\033]12;#cc3333\007'
         command claude $argv
+        printf '\033]111\007'
+        printf '\033]112\007'
         return
     end
 

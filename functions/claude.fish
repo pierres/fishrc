@@ -22,7 +22,6 @@ function claude --wraps claude --description "Run Claude Code inside nono sandbo
         --profile claude-code \
         --allow-cwd \
         --silent \
-        --no-rollback \
         --net-allow
 
     # gh: config + cache for GitHub CLI
@@ -82,7 +81,7 @@ function claude --wraps claude --description "Run Claude Code inside nono sandbo
         set -a nono_args $FISHRC_NONO_EXTRA_ARGS
     end
 
-    nono run $nono_args -- claude $argv
+    nono wrap $nono_args -- claude $argv
 
     if test -n "$tmpdir"
         cd $HOME

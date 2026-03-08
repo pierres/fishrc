@@ -37,6 +37,12 @@ function claude --wraps claude --description "Run Claude Code inside nono sandbo
         touch ~/.npmrc
         set -a nono_args --read-file ~/.npmrc
     end
+    if command -q pnpm
+        set -a nono_args \
+            --allow ~/.local/share/pnpm \
+            --allow ~/.cache/pnpm \
+            --read ~/.config/pnpm
+    end
     if command -q yarn
         set -a nono_args \
             --read-file ~/.yarnrc \

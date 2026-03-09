@@ -55,6 +55,25 @@ function claude --wraps claude --description "Run Claude Code inside nono sandbo
         --allow ~/.cache/claude \
         --allow ~/.cache/claude-cli-nodejs
 
+    # ~/.claude.json — Claude Code writes atomically via temp files:
+    #   <path>.tmp.<PID>.<timestamp> → rename to <path>
+    # It resolves symlinks before computing the temp path, so redirecting
+    # ~/.claude.json into ~/.claude/ keeps all writes inside the already
+    # granted directory. Without this, Landlock would need write on ~/
+    # to allow creation of unpredictable temp file names.
+    set -l claude_json ~/.claude.json
+    set -l claude_json_target ~/.claude/claude.json
+    if test -L $claude_json
+        # already a symlink — nothing to do
+    else if test -f $claude_json
+        mv $claude_json $claude_json_target
+        and ln -s $claude_json_target $claude_json
+        or mv $claude_json_target $claude_json 2>/dev/null
+    else
+        touch $claude_json_target
+        ln -s $claude_json_target $claude_json
+    end
+
     # bun: install cache at ~/.bun
     if command -q bun
         set -a nono_args --allow ~/.bun

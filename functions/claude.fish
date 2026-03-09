@@ -62,9 +62,9 @@ function claude --wraps claude --description "Run Claude Code inside nono sandbo
         set -a nono_args --allow ~/.npm
     end
 
-    # glab: GitLab CLI config and auth
+    # glab: GitLab CLI config and auth (needs write for atomic config updates)
     if command -q glab
-        set -a nono_args --read ~/.config/glab-cli
+        set -a nono_args --allow ~/.config/glab-cli
     end
 
     # ~/.claude.json — Claude Code writes atomically via temp files:

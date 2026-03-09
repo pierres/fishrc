@@ -49,11 +49,23 @@ function claude --wraps claude --description "Run Claude Code inside nono sandbo
             --allow ~/.cache/yarn
     end
 
-    # claude: cache dir for MCP logs and auth state
+    # claude: cache, update staging, and binary versions
     mkdir -p ~/.cache/claude ~/.cache/claude-cli-nodejs
     set -a nono_args \
         --allow ~/.cache/claude \
-        --allow ~/.cache/claude-cli-nodejs
+        --allow ~/.cache/claude-cli-nodejs \
+        --allow ~/.local/share/claude
+
+    # npm: MCP servers launched via npx write to the npm cache
+    if command -q npm
+        mkdir -p ~/.npm
+        set -a nono_args --allow ~/.npm
+    end
+
+    # glab: GitLab CLI config and auth
+    if command -q glab
+        set -a nono_args --read ~/.config/glab-cli
+    end
 
     # ~/.claude.json — Claude Code writes atomically via temp files:
     #   <path>.tmp.<PID>.<timestamp> → rename to <path>
@@ -63,14 +75,12 @@ function claude --wraps claude --description "Run Claude Code inside nono sandbo
     # to allow creation of unpredictable temp file names.
     set -l claude_json ~/.claude.json
     set -l claude_json_target ~/.claude/claude.json
-    if test -L $claude_json
-        # already a symlink — nothing to do
-    else if test -f $claude_json
-        mv $claude_json $claude_json_target
-        and ln -s $claude_json_target $claude_json
-        or mv $claude_json_target $claude_json 2>/dev/null
-    else
-        touch $claude_json_target
+    if not test -L $claude_json
+        if test -f $claude_json
+            mv $claude_json $claude_json_target
+        else
+            touch $claude_json_target
+        end
         ln -s $claude_json_target $claude_json
     end
 

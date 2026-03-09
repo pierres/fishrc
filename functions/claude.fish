@@ -116,6 +116,18 @@ function claude --wraps claude --description "Run Claude Code inside nono sandbo
             --allow ~/.cache/golangci-lint
     end
 
+    # git-over-ssh: grant read access to known_hosts and config only.
+    # Private keys stay blocked (deny_credentials). The SSH agent socket
+    # works through Landlock without explicit rules.
+    # Enable per machine via: set -g FISHRC_NONO_SSH true
+    if test "$FISHRC_NONO_SSH" = true
+        set -a nono_args \
+            --override-deny ~/.ssh/known_hosts \
+            --override-deny ~/.ssh/config \
+            --read-file ~/.ssh/known_hosts \
+            --read-file ~/.ssh/config
+    end
+
     # per-machine overrides via ~/.config/fish/conf.d/local.fish:
     #   set -g FISHRC_NONO_EXTRA_ARGS --allow /extra/path
     if set -q FISHRC_NONO_EXTRA_ARGS

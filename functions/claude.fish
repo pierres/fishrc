@@ -49,12 +49,14 @@ function claude --wraps claude --description "Run Claude Code inside nono sandbo
             --allow ~/.cache/yarn
     end
 
-    # claude: cache, update staging, and binary versions
+    # claude: cache, update staging, binary versions, and symlink dir
+    # ~/.local/bin needs write so the auto-updater can update the claude symlink
     mkdir -p ~/.cache/claude ~/.cache/claude-cli-nodejs
     set -a nono_args \
         --allow ~/.cache/claude \
         --allow ~/.cache/claude-cli-nodejs \
-        --allow ~/.local/share/claude
+        --allow ~/.local/share/claude \
+        --allow ~/.local/bin
 
     # npm: MCP servers launched via npx write to the npm cache
     if command -q npm

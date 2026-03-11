@@ -118,6 +118,11 @@ function claude --wraps claude --description "Run Claude Code inside nono sandbo
             --allow ~/.cache/golangci-lint
     end
 
+    # docker: client config (socket access works through Landlock without rules)
+    if command -q docker
+        set -a nono_args --allow ~/.docker
+    end
+
     # git-over-ssh: grant read access to known_hosts and config only.
     # Private keys stay blocked (deny_credentials). The SSH agent socket
     # works through Landlock without explicit rules.

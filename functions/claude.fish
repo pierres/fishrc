@@ -20,6 +20,7 @@ function claude --wraps claude --description "Run Claude Code inside nono sandbo
     # base sandbox config
     set -l nono_args \
         --profile claude-code \
+        --allow-cwd \
         --silent
 
     # gh: config + cache for GitHub CLI

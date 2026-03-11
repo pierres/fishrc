@@ -20,9 +20,7 @@ function claude --wraps claude --description "Run Claude Code inside nono sandbo
     # base sandbox config
     set -l nono_args \
         --profile claude-code \
-        --allow-cwd \
-        --silent \
-        --net-allow
+        --silent
 
     # gh: config + cache for GitHub CLI
     if command -q gh
@@ -51,10 +49,9 @@ function claude --wraps claude --description "Run Claude Code inside nono sandbo
 
     # claude: cache, update staging, binary versions, and symlink dir
     # ~/.local/bin needs write so the auto-updater can update the claude symlink
-    mkdir -p ~/.cache/claude ~/.cache/claude-cli-nodejs
+    mkdir -p ~/.cache/claude
     set -a nono_args \
         --allow ~/.cache/claude \
-        --allow ~/.cache/claude-cli-nodejs \
         --allow ~/.local/share/claude \
         --allow ~/.local/bin
 

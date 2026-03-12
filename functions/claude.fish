@@ -116,6 +116,14 @@ function claude --wraps claude --description "Run Claude Code inside nono sandbo
             --allow ~/.cache/golangci-lint
     end
 
+    # rust: registry cache and git db need write for cargo to download crates.
+    # The profile's rust_runtime group only grants read to ~/.cargo and ~/.rustup.
+    if command -q cargo
+        set -a nono_args \
+            --allow ~/.cargo/registry \
+            --allow ~/.cargo/git
+    end
+
     # docker: client config (socket access works through Landlock without rules)
     if command -q docker
         set -a nono_args --allow ~/.docker

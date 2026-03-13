@@ -108,9 +108,10 @@ function claude --wraps claude --description "Run Claude Code inside nono sandbo
         set -a nono_args --allow $just_tmpdir
     end
 
-    # go: module/sumdb cache, build cache
+    # go: binaries (read), module/sumdb cache, build cache
     if command -q go
         set -a nono_args \
+            --read (go env GOPATH)/bin \
             --allow (go env GOPATH)/pkg \
             --allow (go env GOCACHE) \
             --allow ~/.cache/golangci-lint

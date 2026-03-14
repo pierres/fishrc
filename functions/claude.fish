@@ -56,6 +56,11 @@ function claude --wraps claude --description "Run Claude Code inside nono sandbo
         --allow ~/.local/share/claude \
         --allow ~/.local/bin
 
+    # managed settings: enterprise/system-wide Claude Code config
+    if test -d /etc/claude-code
+        set -a nono_args --read /etc/claude-code
+    end
+
     # npm: MCP servers launched via npx write to the npm cache
     if command -q npm
         mkdir -p ~/.npm

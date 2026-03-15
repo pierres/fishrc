@@ -114,12 +114,14 @@ function claude --wraps claude --description "Run Claude Code inside nono sandbo
     end
 
     # go: binaries (read), module/sumdb cache, build cache
+    # /usr/include: system headers needed by cgo
     if command -q go
         set -a nono_args \
             --read (go env GOPATH)/bin \
             --allow (go env GOPATH)/pkg \
             --allow (go env GOCACHE) \
-            --allow ~/.cache/golangci-lint
+            --allow ~/.cache/golangci-lint \
+            --read /usr/include
     end
 
     # rust: registry cache and git db need write for cargo to download crates.

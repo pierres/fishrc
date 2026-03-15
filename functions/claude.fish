@@ -89,6 +89,19 @@ function claude --wraps claude --description "Run Claude Code inside nono sandbo
         ln -s $claude_json_target $claude_json
     end
 
+    # ~/.claude.lock — proper-lockfile creates this directory via mkdir/rmdir
+    # for OAuth token refresh locking. Same symlink trick as above: redirect
+    # into ~/.claude/ so Landlock checks resolve against the already-granted
+    # directory instead of needing MAKE_DIR+REMOVE_DIR on $HOME.
+    set -l claude_lock ~/.claude.lock
+    set -l claude_lock_target ~/.claude/.oauth-lock
+    if not test -L $claude_lock
+        rmdir $claude_lock 2>/dev/null; or rm -rf $claude_lock 2>/dev/null
+        ln -sfn $claude_lock_target $claude_lock
+    end
+    # Ensure lock target doesn't exist (= lock is free) before entering sandbox
+    rmdir $claude_lock_target 2>/dev/null
+
     # bun: install cache at ~/.bun
     if command -q bun
         set -a nono_args --allow ~/.bun

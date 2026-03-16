@@ -1,7 +1,6 @@
 function claude --wraps claude --description "Run Claude Code inside nono sandbox"
     if not command -q nono
         echo "nono not found, running claude without sandbox" >&2
-        # Red background + cursor to warn: unsandboxed
         printf '\033]11;#1a0a0a\007'
         printf '\033]12;#cc3333\007'
         command claude $argv
@@ -17,60 +16,16 @@ function claude --wraps claude --description "Run Claude Code inside nono sandbo
         cd $tmpdir
     end
 
-    # base sandbox config
     set -l nono_args \
-        --profile claude-code \
+        --profile /etc/nono/profiles/claude.json \
         --allow-cwd \
         --silent
 
-    # gh: config + cache for GitHub CLI
-    if command -q gh
-        mkdir -p ~/.cache/gh
-        set -a nono_args \
-            --read ~/.config/gh \
-            --allow ~/.cache/gh
-    end
-
-    # node: npm/pnpm/yarn config and caches
-    if command -q pnpm; or command -q npm; or command -q yarn
-        touch ~/.npmrc
-        set -a nono_args --read-file ~/.npmrc
-    end
-    if command -q pnpm
-        set -a nono_args \
-            --allow ~/.local/share/pnpm \
-            --allow ~/.cache/pnpm \
-            --read ~/.config/pnpm
-    end
-    if command -q yarn
-        set -a nono_args \
-            --read-file ~/.yarnrc \
-            --allow ~/.cache/yarn
-    end
-
-    # claude: cache, update staging, binary versions, and symlink dir
-    # ~/.local/bin needs write so the auto-updater can update the claude symlink
-    mkdir -p ~/.cache/claude
-    set -a nono_args \
-        --allow ~/.cache/claude \
-        --allow ~/.local/share/claude \
-        --allow ~/.local/bin
-
-    # managed settings: enterprise/system-wide Claude Code config
-    if test -d /etc/claude-code
-        set -a nono_args --read /etc/claude-code
-    end
-
-    # npm: MCP servers launched via npx write to the npm cache
-    if command -q npm
-        mkdir -p ~/.npm
-        set -a nono_args --allow ~/.npm
-    end
-
-    # glab: GitLab CLI config and auth (needs write for atomic config updates)
-    if command -q glab
-        set -a nono_args --allow ~/.config/glab-cli
-    end
+    # Ensure paths exist before nono resolves them (non-existent paths are skipped).
+    # The built-in claude-code profile pre-creates these itself, but our custom
+    # profile loads by path so that code path doesn't run.
+    mkdir -p ~/.cache/claude ~/.cache/gh ~/.npm ~/.cache/claude-cli-nodejs
+    touch ~/.claude.json.lock
 
     # ~/.claude.json — Claude Code writes atomically via temp files:
     #   <path>.tmp.<PID>.<timestamp> → rename to <path>
@@ -90,34 +45,15 @@ function claude --wraps claude --description "Run Claude Code inside nono sandbo
     end
 
     # ~/.claude.lock — proper-lockfile creates this directory via mkdir/rmdir
-    # for OAuth token refresh locking. Same symlink trick as above: redirect
-    # into ~/.claude/ so Landlock checks resolve against the already-granted
-    # directory instead of needing MAKE_DIR+REMOVE_DIR on $HOME.
+    # for OAuth token refresh locking. Same symlink trick redirects into
+    # ~/.claude/ so Landlock doesn't need MAKE_DIR+REMOVE_DIR on $HOME.
     set -l claude_lock ~/.claude.lock
     set -l claude_lock_target ~/.claude/.oauth-lock
     if not test -L $claude_lock
         rmdir $claude_lock 2>/dev/null; or rm -rf $claude_lock 2>/dev/null
         ln -sfn $claude_lock_target $claude_lock
     end
-    # Ensure lock target doesn't exist (= lock is free) before entering sandbox
     rmdir $claude_lock_target 2>/dev/null
-
-    # bun: install cache at ~/.bun
-    if command -q bun
-        set -a nono_args --allow ~/.bun
-    end
-
-    # deno: module cache
-    if command -q deno
-        set -a nono_args --allow ~/.cache/deno
-    end
-
-    # composer: global config + download cache
-    if command -q composer
-        set -a nono_args \
-            --read ~/.config/composer \
-            --allow ~/.cache/composer
-    end
 
     # just: temp dir for recipe scripts (must exist before nono sees it)
     if command -q just
@@ -126,36 +62,16 @@ function claude --wraps claude --description "Run Claude Code inside nono sandbo
         set -a nono_args --allow $just_tmpdir
     end
 
-    # system headers: needed by cgo, rust -sys crates, etc.
-    if test -d /usr/include
-        set -a nono_args --read /usr/include
-    end
-
-    # go: binaries (read), module/sumdb cache, build cache
+    # go: dynamic paths from go env (not expressible in static profile)
     if command -q go
         set -a nono_args \
             --read (go env GOPATH)/bin \
             --allow (go env GOPATH)/pkg \
-            --allow (go env GOCACHE) \
-            --allow ~/.cache/golangci-lint
+            --allow (go env GOCACHE)
     end
 
-    # rust: registry cache and git db need write for cargo to download crates.
-    # The profile's rust_runtime group only grants read to ~/.cargo and ~/.rustup.
-    if command -q cargo
-        set -a nono_args \
-            --allow ~/.cargo/registry \
-            --allow ~/.cargo/git
-    end
-
-    # docker: client config (socket access works through Landlock without rules)
-    if command -q docker
-        set -a nono_args --allow ~/.docker
-    end
-
-    # git-over-ssh: grant read access to known_hosts and config only.
-    # Private keys stay blocked (deny_credentials). The SSH agent socket
-    # works through Landlock without explicit rules.
+    # git-over-ssh: grant read to known_hosts and config only.
+    # Private keys stay blocked. SSH agent socket works without rules.
     # Enable per machine via: set -g FISHRC_NONO_SSH true
     if test "$FISHRC_NONO_SSH" = true
         set -a nono_args \

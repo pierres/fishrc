@@ -25,35 +25,24 @@ function claude --wraps claude --description "Run Claude Code inside nono sandbo
     # The built-in claude-code profile pre-creates these itself, but our custom
     # profile loads by path so that code path doesn't run.
     mkdir -p ~/.cache/claude ~/.cache/gh ~/.npm ~/.cache/claude-cli-nodejs
-    touch ~/.claude.json.lock
 
-    # ~/.claude.json — Claude Code writes atomically via temp files:
-    #   <path>.tmp.<PID>.<timestamp> → rename to <path>
-    # It resolves symlinks before computing the temp path, so redirecting
-    # ~/.claude.json into ~/.claude/ keeps all writes inside the already
-    # granted directory. Without this, Landlock would need write on ~/
-    # to allow creation of unpredictable temp file names.
-    set -l claude_json ~/.claude.json
-    set -l claude_json_target ~/.claude/claude.json
-    if not test -L $claude_json
-        if test -f $claude_json
-            mv $claude_json $claude_json_target
-        else
-            touch $claude_json_target
+    # Migrate config from ~/.claude.json (symlink in $HOME) to
+    # ~/.claude/.config.json (inside granted dir). This avoids needing
+    # Landlock write on $HOME for temp files and locks.
+    if test -L ~/.claude.json
+        set -l target (readlink ~/.claude.json)
+        if test -f "$target"
+            mv "$target" ~/.claude/.config.json
         end
-        ln -s $claude_json_target $claude_json
+        rm ~/.claude.json
+    else if test -f ~/.claude.json
+        mv ~/.claude.json ~/.claude/.config.json
     end
-
-    # ~/.claude.lock — proper-lockfile creates this directory via mkdir/rmdir
-    # for OAuth token refresh locking. Same symlink trick redirects into
-    # ~/.claude/ so Landlock doesn't need MAKE_DIR+REMOVE_DIR on $HOME.
-    set -l claude_lock ~/.claude.lock
-    set -l claude_lock_target ~/.claude/.oauth-lock
-    if not test -L $claude_lock
-        rmdir $claude_lock 2>/dev/null; or rm -rf $claude_lock 2>/dev/null
-        ln -sfn $claude_lock_target $claude_lock
+    rm -f ~/.claude.json.lock
+    # Clean up broken lock symlink from earlier workaround
+    if test -L ~/.claude.lock
+        rm ~/.claude.lock
     end
-    rmdir $claude_lock_target 2>/dev/null
 
     # just: temp dir for recipe scripts (must exist before nono sees it)
     if command -q just

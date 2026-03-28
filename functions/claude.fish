@@ -39,11 +39,6 @@ function claude --wraps claude --description "Run Claude Code inside nono sandbo
         mv ~/.claude.json ~/.claude/.config.json
     end
     rm -f ~/.claude.json.lock
-    # Clean up broken lock symlink from earlier workaround
-    if test -L ~/.claude.lock
-        rm ~/.claude.lock
-    end
-
     # just: temp dir for recipe scripts (must exist before nono sees it)
     if command -q just
         set -l just_tmpdir /run/user/(id -u)/just
@@ -75,6 +70,10 @@ function claude --wraps claude --description "Run Claude Code inside nono sandbo
     if set -q FISHRC_NONO_EXTRA_ARGS
         set -a nono_args $FISHRC_NONO_EXTRA_ARGS
     end
+
+    # Refresh OAuth token before entering the sandbox — inside Landlock the
+    # token file can't be updated, causing logouts every few hours.
+    command claude update
 
     nono wrap $nono_args -- claude $argv
 

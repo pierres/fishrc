@@ -24,6 +24,6 @@ if status is-interactive
 
     if command -q pnpm
         set -gx PNPM_HOME $HOME/.local/share/pnpm
-        set -gxa PATH $PNPM_HOME
+        set -gxa PATH $PNPM_HOME/bin
     end
 end

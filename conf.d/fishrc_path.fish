@@ -1,29 +1,23 @@
 if status is-interactive
-    if test -d $HOME/.local/bin
-        set -gxa PATH $HOME/.local/bin
-    end
-
-    if test -d $HOME/bin
-        set -gxa PATH $HOME/bin
-    end
+    fish_add_path --path --append $HOME/.local/bin $HOME/bin
 
     if command -q rustup
         set -l rust_path (rustup which rustc 2> /dev/null)
         if test -n "$rust_path"
-            set -gxa PATH (path dirname "$rust_path")
+            fish_add_path --path --append (path dirname "$rust_path")
         end
     end
 
     if command -q cargo
-        set -gxa PATH $HOME/.cargo/bin
+        fish_add_path --path --append $HOME/.cargo/bin
     end
 
     if command -q go
-        set -gxa PATH "$(go env GOPATH)/bin"
+        fish_add_path --path --append "$(go env GOPATH)/bin"
     end
 
     if command -q pnpm
         set -gx PNPM_HOME $HOME/.local/share/pnpm
-        set -gxa PATH $PNPM_HOME/bin
+        fish_add_path --path --append $PNPM_HOME/bin
     end
 end

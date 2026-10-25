@@ -11,7 +11,7 @@ function create-cd-image --description 'Create cue/bin image file of a CD-ROM'
     set -l name $argv[1]
 
     # see https://www.dosbox.com/wiki/Cuesheet
-    cdrdao read-cd --datafile "$name.bin" --driver generic-mmc:0x20000 --device /dev/cdrom --read-raw "$name.toc"
-    toc2cue "$name.toc" "$name.cue"
+    cdrdao read-cd --datafile "$name.bin" --driver generic-mmc:0x20000 --device /dev/cdrom --read-raw "$name.toc"; or return
+    toc2cue "$name.toc" "$name.cue"; or return
     rm "$name.toc"
 end

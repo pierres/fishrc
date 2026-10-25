@@ -16,6 +16,17 @@ curl -sSL https://raw.githubusercontent.com/pierres/fishrc/main/install.fish | f
 The home installer installs [Tide 7.2.0](https://github.com/plttn/tide/releases/tag/v7.2.0)
 if Tide is not already available. It leaves existing Tide installations in place.
 
+## Configuration updates
+Interactive startup runs `_fishrc_reset_config --if-needed`. A universal
+`_fishrc_config_revision` records the last applied fishrc revision. A revision
+change reapplies the defaults, clearing universal variables as described above.
+The revision is saved after success; failed setup is retried next startup.
+Run `_fishrc_reset_config` without arguments to force a reset.
+
+Increment `config_revision` in `functions/_fishrc_reset_config.fish` whenever
+changes to the defaults should trigger a reset. Fish and Tide version changes
+do not trigger resets; review major updates and bump the revision if needed.
+
 ## Functions
 This configuration comes with a set of custom functions to streamline common tasks:
 

@@ -1,11 +1,18 @@
 function _fishrc_reset_config --description 'Reset Fish configuration and reconfigure fishrc'
+    argparse if-needed -- $argv; or return
+
+    set -l config_revision 1
+    if set -q _flag_if_needed; and test "$_fishrc_config_revision" = "$config_revision"
+        return 0
+    end
+
     for e in (set -nU)
         if test $e != __fish_initialized
             set -eU $e
         end
     end
 
-    yes | fish_config theme save Tomorrow\ Night\ Bright
+    yes | fish_config theme save Tomorrow\ Night\ Bright; or return
 
     tide configure \
         --auto \
@@ -23,7 +30,7 @@ function _fishrc_reset_config --description 'Reset Fish configuration and reconf
 
     set tide_right_prompt_items status cmd_duration context jobs
     set tide_pwd_icon_unwritable 🗲
-    tide reload
+    tide reload; or return
 
-    fish_prompt
+    set -U _fishrc_config_revision $config_revision
 end

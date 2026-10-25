@@ -9,7 +9,7 @@ function bsdtar
     if test "$argv[2]" = "$FISHRC_TEST_FAIL_ARCHIVE"
         return 42
     end
-    printf '%s\n' "$argv[2]" >"$argv[-1]/file"
+    command cp "$argv[2]" "$argv[-1]/file"
 end
 
 set -l fixture_dir "$XDG_CONFIG_HOME/tar diff"
@@ -19,11 +19,11 @@ set -lx FISHRC_TEST_LOG "$fixture_dir/extractions"
 set -lx FISHRC_TEST_FAIL_ARCHIVE ''
 set -l first "$fixture_dir/first archive.tar"
 set -l second "$fixture_dir/second archive.tar"
-printf '%s\n' archive >"$first"
-printf '%s\n' archive >"$second"
+printf '%s\n' old >"$first"
+printf '%s\n' new >"$second"
 cd "$fixture_dir"; or exit 1
 
-for scenario in first-failure second-failure success
+for scenario in first-failure second-failure success identical
     set -l expected_status 0
     set -l expected_extractions 2
     switch $scenario
@@ -36,6 +36,8 @@ for scenario in first-failure second-failure success
             set expected_status 42
         case success
             set FISHRC_TEST_FAIL_ARCHIVE ''
+        case identical
+            command cp "$first" "$second"; or exit 1
     end
     printf '' >"$FISHRC_TEST_LOG"
     tar-diff "$first" "$second"
@@ -50,6 +52,11 @@ for scenario in first-failure second-failure success
 
     if test "$scenario" = success
         test -s 'first archive.tar-second archive.tar.patch'; or exit 1
+        string match -q -- -old <'first archive.tar-second archive.tar.patch'; or exit 1
+        string match -q -- '+new' <'first archive.tar-second archive.tar.patch'; or exit 1
+    else if test "$scenario" = identical
+        test -f 'first archive.tar-second archive.tar.patch'; or exit 1
+        test -s 'first archive.tar-second archive.tar.patch'; and exit 1
     else
         test -e 'first archive.tar-second archive.tar.patch'; and exit 1
     end
@@ -67,6 +74,27 @@ if test $compare_status -ne 0; or test $unrelated_status -ne 0
     echo 'Archive comparison failed or waited for an unrelated job' >&2
     exit 1
 end
+
+function diff
+    return 2
+end
+tar-diff "$first" "$second"
+if test $status -ne 2
+    echo 'Archive comparison hid the diff failure' >&2
+    exit 1
+end
+test "$PWD" = "$fixture_dir"; or exit 1
+
+command rm 'first archive.tar-second archive.tar.patch'; or exit 1
+mkdir 'first archive.tar-second archive.tar.patch'; or exit 1
+tar-diff "$first" "$second" 2>"$fixture_dir/output-error"
+if test $status -eq 0
+    echo 'Archive comparison accepted an unwritable patch path' >&2
+    exit 1
+end
+test "$PWD" = "$fixture_dir"; or exit 1
+set -l leftovers (find "$TMPDIR" -mindepth 1 -maxdepth 1)
+test (count $leftovers) -eq 0; or exit 1
 
 function mktemp
     return 43

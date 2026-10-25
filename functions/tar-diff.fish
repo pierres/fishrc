@@ -41,11 +41,17 @@ function tar-diff --description 'Create a patch file containing the differences 
     end
 
     # create a patch file
+    set -l compare_status 1
     begin
-        pushd "$tmpdir"
-        diff -Nura "$aname" "$bname"
-        popd
+        if pushd "$tmpdir"
+            diff -Nura -- "$aname" "$bname"
+            set compare_status $status
+            # diff returns 1 when files differ.
+            test $compare_status -eq 1; and set compare_status 0
+            popd; or set compare_status $status
+        end
     end >"$aname-$bname.patch"
 
-    rm -rf "$tmpdir"
+    rm -rf "$tmpdir"; or return
+    return $compare_status
 end

@@ -4,6 +4,10 @@ check:
     find . -type f -name '*.fish' -print -exec fish_indent -c {} +
     just --unstable --fmt --check
 
+# run Fish regression tests in isolated configuration directories
+test:
+    fish --no-config tests/run.fish
+
 # format fish and just files
 fmt:
     find . -type f -name '*.fish' -print -exec fish_indent -w {} +

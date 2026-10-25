@@ -17,3 +17,5 @@ jobs:
         uses: actions/checkout@v7
       - name: Check
         run: just check
+      - name: Test
+        run: just test

@@ -17,8 +17,7 @@ function _fishrc_reset_config --description 'Reset Fish configuration and reconf
         --powerline_prompt_tails=Flat \
         --powerline_prompt_style='One line' \
         --prompt_spacing=Compact \
-        --icons='Few icons' \
-        --transient=No
+        --icons='Few icons'; or return
 
     set -U fish_greeting
 

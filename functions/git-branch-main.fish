@@ -13,16 +13,18 @@ function git-branch-main --description 'Rename the default Git branch from maste
         return 1
     end
 
-    git branch -m master main
+    git branch -m master main; or return
 
-    git push -u origin main
+    git push -u origin main; or return
 
     if command -q gh
-        if string match -q master (gh repo view --jq '.defaultBranchRef.name' --json 'defaultBranchRef' 2>/dev/null)
-            gh repo edit --default-branch main
+        set -l default_branch (gh repo view --jq '.defaultBranchRef.name' --json 'defaultBranchRef'); or return
+        if test "$default_branch" = master
+            gh repo edit --default-branch main; or return
         end
-    else if git remote -v | string match -q 'github.com'
+    else if git remote -v | string match -q '*github.com*'
         echo "Warning: 'gh' command not found, please change the default branch on GitHub manually." >&2
+        return 1
     end
 
     git push origin --delete master

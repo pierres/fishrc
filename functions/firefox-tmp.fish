@@ -3,13 +3,11 @@ function firefox-tmp --wraps firefox --description 'Launch a clean Firefox insta
         return 1
     end
 
-    set -l tmpdir (mktemp -d -t firefox-tmp.XXXXXXXXXX)
-    set -x XDG_CACHE_HOME "$tmpdir/cache"
+    set -l tmpdir (mktemp -d -t firefox-tmp.XXXXXXXXXX); or return
+    set -lx XDG_CACHE_HOME "$tmpdir/cache"
     mkdir "$XDG_CACHE_HOME" "$tmpdir/data"
 
-    trap "rm -rf '$tmpdir'" EXIT INT
-
-    echo '
+    and echo '
         user_pref("browser.shell.checkDefaultBrowser", false);
         user_pref("browser.aboutwelcome.enabled", false);
         user_pref("trailhead.firstrun.didSeeAboutWelcome", true);
@@ -30,10 +28,12 @@ function firefox-tmp --wraps firefox --description 'Launch a clean Firefox insta
         user_pref("browser.toolbars.bookmarks.visibility", "never");
     ' >"$tmpdir/data/user.js"
 
-    firefox \
+    and firefox \
         --profile "$tmpdir/data" \
         --no-remote \
         $argv
+    set -l browser_status $status
 
-    rm -rf "$tmpdir"
+    rm -rf "$tmpdir"; or return
+    return $browser_status
 end

@@ -3,10 +3,8 @@ function chromium-tmp --wraps chromium --description 'Launch a clean Chromium in
         return 1
     end
 
-    set -l tmpdir (mktemp -d -t chromium-tmp.XXXXXXXXXX)
-    set -x XDG_CACHE_HOME "$tmpdir/cache"
-
-    trap "rm -rf '$tmpdir'" EXIT INT
+    set -l tmpdir (mktemp -d -t chromium-tmp.XXXXXXXXXX); or return
+    set -lx XDG_CACHE_HOME "$tmpdir/cache"
 
     chromium \
         --no-first-run \
@@ -15,6 +13,8 @@ function chromium-tmp --wraps chromium --description 'Launch a clean Chromium in
         --password-store=basic \
         --user-data-dir="$tmpdir/data" \
         $argv
+    set -l browser_status $status
 
-    rm -rf "$tmpdir"
+    rm -rf "$tmpdir"; or return
+    return $browser_status
 end

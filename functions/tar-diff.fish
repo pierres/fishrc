@@ -31,7 +31,6 @@ function tar-diff --description 'Create a patch file containing the differences 
 
     # Extract tar files into temporary directories
     set -l tmpdir (mktemp -d -t tar-diff.XXXXXXXXXX); or return
-    trap "rm -rf '$tmpdir'" EXIT INT
     mkdir "$tmpdir/$aname" "$tmpdir/$bname"
     and bsdtar xf "$a" --strip-components=1 -C "$tmpdir/$aname"
     and bsdtar xf "$b" --strip-components=1 -C "$tmpdir/$bname"

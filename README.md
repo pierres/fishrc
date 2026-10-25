@@ -43,6 +43,10 @@ This configuration comes with a set of custom functions to streamline common tas
 | `tar-diff` | Create a patch file containing the differences between the content of two tar archives |
 | `update-all` | Update all packages using different package managers |
 
+Temporary browser profiles and archive work directories are removed when the
+helper finishes normally or reports a command failure. Interrupting a helper
+with Ctrl+C can leave its temporary directory behind.
+
 ## Dependencies
 This configuration relies on the following external commands:
 

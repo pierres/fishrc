@@ -42,6 +42,8 @@ fish -c 'source "$FISHRC_TEST_FIXTURE"
 set -U fishrc_test_unrelated keep-until-reset
 _fishrc_reset_config --if-needed >/dev/null; or exit 1
 test "$fishrc_test_unrelated" = keep-until-reset; or exit 1
+test "$tide_right_prompt_items" = "status cmd_duration context jobs"; or exit 1
+set -q -U fish_greeting; and test (count $fish_greeting) -eq 0; or exit 1
 '; or exit 1
 test (count (cat "$FISHRC_TEST_LOG")) -eq 1; or exit 1
 

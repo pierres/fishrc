@@ -1,6 +1,6 @@
 # check syntax and format of fish and just files
 check:
-    find . -type f -name '*.fish' -print -exec fish --no-execute {} +
+    find . -type f -name '*.fish' -print -exec sh -c 'for check_file; do fish --no-execute "$check_file" || exit; done' sh {} +
     find . -type f -name '*.fish' -print -exec fish_indent -c {} +
     just --unstable --fmt --check
 

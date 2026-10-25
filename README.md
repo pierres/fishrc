@@ -4,7 +4,7 @@ This project contains my preferred Fish configuration. It tries to be system ind
 ## Installation
 This configuration can be installed using the `justfile` included in this repository. Run the following command to install the configuration files to the `/etc/fish` directory:
 ```sh
-just install target /
+just install /
 ```
 
 Alternatively, you can install the configuration to your home directory by running the following command:

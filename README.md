@@ -13,6 +13,9 @@ Alternatively, you can install the configuration to your home directory by runni
 curl -sSL https://raw.githubusercontent.com/pierres/fishrc/main/install.fish | fish
 ```
 
+The home installer installs [Tide 7.2.0](https://github.com/plttn/tide/releases/tag/v7.2.0)
+if Tide is not already available. It leaves existing Tide installations in place.
+
 ## Functions
 This configuration comes with a set of custom functions to streamline common tasks:
 
@@ -34,7 +37,7 @@ This configuration relies on the following external commands:
 
 ### Core
 * [fish](https://fishshell.com/)
-* [tide](https://github.com/IlanCosman/tide)
+* [tide](https://github.com/plttn/tide)
 
 ### Functions
 * **`create-cd-image`**: `cdrdao`, `toc2cue`
